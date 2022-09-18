@@ -14,7 +14,6 @@ from telegraph import Telegraph
 import socket
 import faulthandler
 faulthandler.enable()
-from megasdkrestclient import MegaSdkRestClient, errors as mega_err
 import subprocess
 
 socket.setdefaulttimeout(600)
@@ -107,62 +106,8 @@ telegraph.create_account(short_name=sname)
 telegraph_token = telegraph.get_access_token()
 LOGGER.info("Telegraph Token Generated: '" + telegraph_token + "'")
 
-try:
-    MEGA_KEY = getConfig('MEGA_KEY')
 
-except KeyError:
-    MEGA_KEY = None
-    LOGGER.info('MEGA API KEY NOT AVAILABLE')
-if MEGA_KEY is not None:
-    try:
-        MEGA_USERNAME = getConfig('MEGA_USERNAME')
-        MEGA_PASSWORD = getConfig('MEGA_PASSWORD')
-        # Start megasdkrest binary
-        subprocess.Popen(["megasdkrest", "--apikey", MEGA_KEY])
-        time.sleep(3)
-        mega_client = MegaSdkRestClient('http://localhost:6090')
-        try:
-            mega_client.login(MEGA_USERNAME, MEGA_PASSWORD)
-        except mega_err.MegaSdkRestClientException as e:
-            logging.error(e.message['message'])
-            exit(0)
-    except KeyError:
-        LOGGER.info("Mega API KEY provided but credentials not provided. Starting mega in anonymous mode!")
-        MEGA_USERNAME = None
-        MEGA_PASSWORD = None
-else:
-    MEGA_USERNAME = None
-    MEGA_PASSWORD = None
-try:
-    INDEX_URL = getConfig('INDEX_URL')
-    if len(INDEX_URL) == 0:
-        INDEX_URL = None
-except KeyError:
-    INDEX_URL = None
-try:
-    BUTTON_THREE_NAME = getConfig('BUTTON_THREE_NAME')
-    BUTTON_THREE_URL = getConfig('BUTTON_THREE_URL')
-    if len(BUTTON_THREE_NAME) == 0 or len(BUTTON_THREE_URL) == 0:
-        raise KeyError
-except KeyError:
-    BUTTON_THREE_NAME = None
-    BUTTON_THREE_URL = None
-try:
-    BUTTON_FOUR_NAME = getConfig('BUTTON_FOUR_NAME')
-    BUTTON_FOUR_URL = getConfig('BUTTON_FOUR_URL')
-    if len(BUTTON_FOUR_NAME) == 0 or len(BUTTON_FOUR_URL) == 0:
-        raise KeyError
-except KeyError:
-    BUTTON_FOUR_NAME = None
-    BUTTON_FOUR_URL = None
-try:
-    BUTTON_FIVE_NAME = getConfig('BUTTON_FIVE_NAME')
-    BUTTON_FIVE_URL = getConfig('BUTTON_FIVE_URL')
-    if len(BUTTON_FIVE_NAME) == 0 or len(BUTTON_FIVE_URL) == 0:
-        raise KeyError
-except KeyError:
-    BUTTON_FIVE_NAME = None
-    BUTTON_FIVE_URL = None
+
 try:
     STOP_DUPLICATE_MIRROR = getConfig('STOP_DUPLICATE_MIRROR')
     if STOP_DUPLICATE_MIRROR.lower() == 'true':
@@ -189,14 +134,7 @@ try:
 except KeyError:
     USE_SERVICE_ACCOUNTS = False
 
-try:
-    BLOCK_MEGA_LINKS = getConfig('BLOCK_MEGA_LINKS')
-    if BLOCK_MEGA_LINKS.lower() == 'true':
-        BLOCK_MEGA_LINKS = True
-    else:
-        BLOCK_MEGA_LINKS = False
-except KeyError:
-    BLOCK_MEGA_LINKS = False
+
 
 try:
     SHORTENER = getConfig('SHORTENER')
