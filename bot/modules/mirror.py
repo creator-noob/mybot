@@ -2,7 +2,7 @@ import requests
 from telegram.ext import CommandHandler
 from telegram import InlineKeyboardMarkup
 
-from bot import Interval, INDEX_URL, LOGGER, MEGA_KEY, BUTTON_THREE_NAME, BUTTON_THREE_URL, BUTTON_FOUR_NAME, BUTTON_FOUR_URL, BUTTON_FIVE_NAME, BUTTON_FIVE_URL, BLOCK_MEGA_LINKS
+from bot import Interval, INDEX_URL, LOGGER, BUTTON_THREE_NAME, BUTTON_THREE_URL, BUTTON_FOUR_NAME, BUTTON_FOUR_URL, BUTTON_FIVE_NAME, BUTTON_FIVE_URL,
 from bot import dispatcher, DOWNLOAD_DIR, DOWNLOAD_STATUS_UPDATE_INTERVAL, download_dict, download_dict_lock, SHORTENER, SHORTENER_API
 from bot.helper.ext_utils import fs_utils, bot_utils
 from bot.helper.ext_utils.bot_utils import setInterval
@@ -19,7 +19,6 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import *
 from bot.helper.telegram_helper import button_build
-from bot.helper.mirror_utils.download_utils.mega_download import MegaDownloader
 import urllib
 import pathlib
 import os
@@ -264,24 +263,7 @@ def _mirror(bot, update, isTar=False, extract=False):
         tag = None
     if not bot_utils.is_url(link) and not bot_utils.is_magnet(link):
         sendMessage('No download source provided', bot, update)
-        return
-
-    try:
-        link = direct_link_generator(link)
-    except DirectDownloadLinkException as e:
-        LOGGER.info(f'{link}: {e}')
-    listener = MirrorListener(bot, update, pswd, isTar, tag, extract)
-    if bot_utils.is_mega_link(link) and MEGA_KEY is not None and not BLOCK_MEGA_LINKS:
-        mega_dl = MegaDownloader(listener)
-        mega_dl.add_download(link, f'{DOWNLOAD_DIR}{listener.uid}/')
-        sendStatusMessage(update, bot)
-    elif bot_utils.is_mega_link(link) and BLOCK_MEGA_LINKS:
-        sendMessage("Mega links are blocked. Dont try to mirror mega links.", bot, update)
-    else:
-        ariaDlManager.add_download(link, f'{DOWNLOAD_DIR}{listener.uid}/', listener, name)
-        sendStatusMessage(update, bot)
-    if len(Interval) == 0:
-        Interval.append(setInterval(DOWNLOAD_STATUS_UPDATE_INTERVAL, update_all_messages))
+       
 
 
 def mirror(update, context):
